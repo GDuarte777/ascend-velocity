@@ -58,9 +58,9 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         neon: {
-          blue: "hsl(var(--neon-blue))",
-          violet: "hsl(var(--neon-violet))",
-          turquoise: "hsl(var(--neon-turquoise))",
+          magenta: "hsl(var(--neon-magenta))",
+          pink: "hsl(var(--neon-pink))",
+          orange: "hsl(var(--neon-orange))",
         },
         glass: {
           bg: "hsl(var(--glass-bg))",
@@ -121,10 +121,10 @@ export default {
         },
         "glow": {
           "0%, 100%": {
-            boxShadow: "0 0 20px hsl(var(--neon-blue) / 0.3)",
+            boxShadow: "0 0 20px hsl(var(--neon-magenta) / 0.3)",
           },
           "50%": {
-            boxShadow: "0 0 30px hsl(var(--neon-blue) / 0.5)",
+            boxShadow: "0 0 30px hsl(var(--neon-magenta) / 0.5)",
           },
         },
         "spotlight": {
