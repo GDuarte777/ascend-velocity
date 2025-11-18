@@ -9,10 +9,9 @@ import {
   Settings,
   Target,
   Award,
-  Zap,
-  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Dock, DockIcon, DockItem, DockLabel } from "@/components/ui/dock";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -35,60 +34,41 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-white/10 glass-card flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-white/10">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-blue to-neon-violet flex items-center justify-center animate-glow">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold gradient-text">GameTeam</span>
-          </Link>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
-                isActive(item.to)
-                  ? "bg-gradient-to-r from-neon-blue/20 to-neon-violet/20 border border-neon-blue/30 text-foreground font-medium"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-              )}
-            >
-              <item.icon className="w-5 h-5" />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </nav>
-
-        {/* User Info */}
-        <div className="p-4 border-t border-white/10">
-          <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-blue to-neon-violet flex items-center justify-center font-bold">
-              G
-            </div>
-            <div className="flex-1">
-              <p className="font-medium text-sm">Gestor Admin</p>
-              <p className="text-xs text-muted-foreground">gestor@email.com</p>
-            </div>
-          </div>
-          <button className="w-full flex items-center gap-2 px-4 py-2 mt-2 text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-xl transition-colors">
-            <LogOut className="w-4 h-4" />
-            <span className="text-sm">Sair</span>
-          </button>
-        </div>
-      </aside>
-
+    <div className="min-h-screen flex flex-col">
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto pb-24">
         {children}
       </main>
+
+      {/* Dock Navigation */}
+      <div className="fixed bottom-4 left-0 right-0 z-50">
+        <Dock className="items-end pb-3">
+          {navItems.map((item) => (
+            <Link key={item.to} to={item.to}>
+              <DockItem
+                className={cn(
+                  "aspect-square rounded-full transition-colors",
+                  isActive(item.to)
+                    ? "bg-gradient-to-br from-neon-blue to-neon-violet"
+                    : "bg-gray-200 dark:bg-neutral-800"
+                )}
+              >
+                <DockLabel>{item.label}</DockLabel>
+                <DockIcon>
+                  <item.icon
+                    className={cn(
+                      "h-full w-full",
+                      isActive(item.to)
+                        ? "text-white"
+                        : "text-neutral-600 dark:text-neutral-300"
+                    )}
+                  />
+                </DockIcon>
+              </DockItem>
+            </Link>
+          ))}
+        </Dock>
+      </div>
     </div>
   );
 };
