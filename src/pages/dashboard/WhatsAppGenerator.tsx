@@ -8,7 +8,8 @@ import {
   Send,
   CheckCircle2,
   History,
-  Trash2
+  Trash2,
+  Save
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -217,7 +218,7 @@ export default function WhatsAppGenerator() {
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button 
-                  onClick={copyToClipboard} 
+                  onClick={() => copyToClipboard(generatedLink)} 
                   disabled={!generatedLink}
                   className="flex-1 bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/20"
                 >
@@ -226,7 +227,7 @@ export default function WhatsAppGenerator() {
                 </Button>
                 
                 <Button 
-                  onClick={openLink} 
+                  onClick={() => openLink(generatedLink)} 
                   disabled={!generatedLink}
                   variant="outline"
                   className="flex-1 border-green-500/30 hover:bg-green-500/10 text-green-600 dark:text-green-400"

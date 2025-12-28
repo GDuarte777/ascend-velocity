@@ -434,7 +434,7 @@ export default function LinkBio() {
     setNewLinkData({
       title: link.title,
       url: link.url,
-      type: link.type || (themeConfig.layout === 'shop' ? 'product' : 'simple'),
+      type: (link.type === 'featured' ? 'product' : link.type) || (themeConfig.layout === 'shop' ? 'product' : 'simple'),
       price: link.price || "",
       description: link.description || "",
       category: link.category || "",
@@ -623,7 +623,7 @@ export default function LinkBio() {
               
               <div className="flex gap-2">
                 <NeonButton 
-                  variant="primary" 
+                  variant="neon" 
                   className="flex-1 sm:flex-none justify-center gap-2 min-w-[120px]"
                   onClick={handleSave}
                   disabled={isSaving}
@@ -892,12 +892,12 @@ export default function LinkBio() {
                                       onChange={async (e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
-                                          setIsSaving(true);
-                                          const publicUrl = await uploadImage(file);
-                                          setIsSaving(false);
-                                          if (publicUrl) {
-                                            setNewLinkData({...newLinkData, image: publicUrl});
-                                          }
+                                          const reader = new FileReader();
+                                          reader.onloadend = () => {
+                                            const result = reader.result as string;
+                                            setNewLinkData({...newLinkData, image: result});
+                                          };
+                                          reader.readAsDataURL(file);
                                         }
                                       }}
                                       className="absolute inset-0 opacity-0 cursor-pointer z-10"

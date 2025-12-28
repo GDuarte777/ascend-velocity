@@ -244,7 +244,7 @@ export default function Raffle() {
       finalResult = shuffled.slice(0, quantity);
     }
 
-    setResult(finalResult);
+    setResult(finalResult as string[] | number[]);
     setIsDrawing(false);
     triggerConfetti();
 
@@ -618,7 +618,7 @@ export default function Raffle() {
                             {Array.isArray(item.result) ? item.result.join(', ') : ''}
                           </p>
                         </div>
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => deleteRaffle(item.id)}>
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => deleteFromHistory(item.id)}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
