@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, ReactNode } from 'react';
+import React, { useEffect, useRef, ReactNode, CSSProperties } from 'react';
 
 interface GlowCardProps {
   children: ReactNode;
@@ -7,8 +7,8 @@ interface GlowCardProps {
   size?: 'sm' | 'md' | 'lg';
   width?: string | number;
   height?: string | number;
-  customSize?: boolean; // When true, ignores size prop and uses width/height or className
-  debugMode?: boolean; // Enable visual debugging for cursor alignment
+  customSize?: boolean;
+  debugMode?: boolean;
 }
 
 const glowColorMap = {
@@ -25,6 +25,21 @@ const sizeMap = {
   lg: 'w-80 h-96'
 };
 
+interface ExtendedCSSProperties extends CSSProperties {
+  '--base'?: number;
+  '--spread'?: number;
+  '--radius'?: string;
+  '--border'?: string;
+  '--backdrop'?: string;
+  '--backup-border'?: string;
+  '--size'?: string;
+  '--outer'?: string;
+  '--opacity'?: string;
+  '--border-size'?: string;
+  '--spotlight-size'?: string;
+  '--hue'?: string;
+}
+
 const GlowCard: React.FC<GlowCardProps> = ({ 
   children, 
   className = '', 
@@ -38,7 +53,6 @@ const GlowCard: React.FC<GlowCardProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const lastPositionRef = useRef({ x: 0, y: 0 });
-  const isTrackingRef = useRef(false);
 
   useEffect(() => {
     const syncPointer = (e: PointerEvent) => {
@@ -46,15 +60,11 @@ const GlowCard: React.FC<GlowCardProps> = ({
       
       const rect = cardRef.current.getBoundingClientRect();
       
-      // Check if cursor is over this specific card
       const isOverCard = e.clientX >= rect.left && e.clientX <= rect.right && 
                         e.clientY >= rect.top && e.clientY <= rect.bottom;
       
-      // Only apply effect when cursor is over this card
       if (!isOverCard) {
-        // Reset effect when cursor leaves with smooth transition
         cardRef.current.style.setProperty('--opacity', '0');
-        // Move spotlight off-screen after fade out
         setTimeout(() => {
           if (cardRef.current) {
             cardRef.current.style.setProperty('--x', '-100px');
@@ -64,33 +74,27 @@ const GlowCard: React.FC<GlowCardProps> = ({
         return;
       }
       
-      // Calculate exact position relative to the card with sub-pixel precision
       const relativeX = e.clientX - rect.left;
       const relativeY = e.clientY - rect.top;
       
-      // Clamp values to card boundaries to prevent overflow
       const clampedX = Math.max(0, Math.min(relativeX, rect.width));
       const clampedY = Math.max(0, Math.min(relativeY, rect.height));
       
-      // Only update if position changed significantly (sub-pixel movement)
       const deltaX = Math.abs(clampedX - lastPositionRef.current.x);
       const deltaY = Math.abs(clampedY - lastPositionRef.current.y);
       
       if (deltaX > 0.1 || deltaY > 0.1) {
         lastPositionRef.current = { x: clampedX, y: clampedY };
         
-        // Set CSS custom properties for exact cursor positioning
         cardRef.current.style.setProperty('--x', `${clampedX.toFixed(2)}px`);
         cardRef.current.style.setProperty('--y', `${clampedY.toFixed(2)}px`);
         cardRef.current.style.setProperty('--xp', (clampedX / rect.width).toFixed(6));
         cardRef.current.style.setProperty('--yp', (clampedY / rect.height).toFixed(6));
         cardRef.current.style.setProperty('--opacity', '1');
         
-        // Store card dimensions for responsive calculations
         cardRef.current.style.setProperty('--card-width', `${rect.width}px`);
         cardRef.current.style.setProperty('--card-height', `${rect.height}px`);
         
-        // Update debug display if enabled
         if (debugMode && cardRef.current) {
           const debugX = cardRef.current.querySelector('#debug-x');
           const debugY = cardRef.current.querySelector('#debug-y');
@@ -100,7 +104,6 @@ const GlowCard: React.FC<GlowCardProps> = ({
       }
     };
 
-    // Use requestAnimationFrame for smooth updates
     let rafId: number;
     const throttledSyncPointer = (e: PointerEvent) => {
       cancelAnimationFrame(rafId);
@@ -116,25 +119,24 @@ const GlowCard: React.FC<GlowCardProps> = ({
 
   const { base, spread } = glowColorMap[glowColor];
 
-  // Determine sizing
   const getSizeClasses = () => {
     if (customSize) {
-      return ''; // Let className or inline styles handle sizing
+      return '';
     }
     return sizeMap[size];
   };
 
-  const getInlineStyles = () => {
-    const baseStyles = {
+  const getInlineStyles = (): ExtendedCSSProperties => {
+    const baseStyles: ExtendedCSSProperties = {
       '--base': base,
       '--spread': spread,
       '--radius': '14',
-      '--border': '1', // Reduced from 3 to 1 for a cleaner, modern look
-      '--backdrop': 'transparent', // Removed explicit backdrop color for better theme adaptability
-      '--backup-border': 'transparent', // Removed hardcoded border
+      '--border': '1',
+      '--backdrop': 'transparent',
+      '--backup-border': 'transparent',
       '--size': '200',
       '--outer': '1',
-      '--opacity': '0', // Initially hidden
+      '--opacity': '0',
       '--border-size': 'calc(var(--border, 1) * 1px)',
       '--spotlight-size': 'calc(var(--size, 150) * 1px)',
       '--hue': 'calc(var(--base) + (var(--xp, 0) * var(--spread, 0)))',
@@ -148,14 +150,13 @@ const GlowCard: React.FC<GlowCardProps> = ({
       backgroundSize: 'calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)))',
       backgroundPosition: '0 0',
       border: 'var(--border-size) solid var(--backup-border)',
-      position: 'relative' as const,
-      touchAction: 'none' as const,
-      willChange: 'background-image' as const,
-      overflow: 'hidden' as const,
-      transition: 'background-image 0.2s ease-out' as const,
+      position: 'relative',
+      touchAction: 'none',
+      willChange: 'background-image',
+      overflow: 'hidden',
+      transition: 'background-image 0.2s ease-out',
     };
 
-    // Add width and height if provided
     if (width !== undefined) {
       baseStyles.width = typeof width === 'number' ? `${width}px` : width;
     }
