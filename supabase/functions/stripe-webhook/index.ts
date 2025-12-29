@@ -1,3 +1,4 @@
+import Stripe from "https://esm.sh/stripe@15.12.0?target=deno";
 import { supabaseAdmin } from "../_shared/supabaseClient.ts";
 import { stripe } from "../_shared/stripeClient.ts";
 
@@ -10,7 +11,7 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
-async function handleCheckoutCompleted(event: stripe.CheckoutSessionCompletedEvent) {
+async function handleCheckoutCompleted(event: Stripe.CheckoutSessionCompletedEvent) {
   const session = event.data.object;
   const subscriptionId = session.subscription;
 
@@ -77,7 +78,7 @@ async function handleCheckoutCompleted(event: stripe.CheckoutSessionCompletedEve
     .eq("id", userId);
 }
 
-async function handleSubscriptionUpdated(event: stripe.CustomerSubscriptionUpdatedEvent | stripe.CustomerSubscriptionDeletedEvent) {
+async function handleSubscriptionUpdated(event: Stripe.CustomerSubscriptionUpdatedEvent | Stripe.CustomerSubscriptionDeletedEvent) {
   const subscription = event.data.object;
   const currentPeriodEnd = subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : null;
 
@@ -107,7 +108,7 @@ async function handleSubscriptionUpdated(event: stripe.CustomerSubscriptionUpdat
   }
 }
 
-async function handleInvoicePaid(event: stripe.InvoicePaymentSucceededEvent) {
+async function handleInvoicePaid(event: Stripe.InvoicePaymentSucceededEvent) {
   const invoice = event.data.object;
   const subscriptionId = invoice.subscription;
 
